@@ -25,26 +25,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
 
-//using routes
-const userRoute = require("./app/router/userRouter");
-app.use("/api", userRoute);
-const productRoute = require("./app/router/productRouter");
-app.use("/api", productRoute);
-
-// Debug error logger
-app.use((err, req, res, next) => {
-  console.error("🔥🔥🔥 FULL ERROR 🔥🔥🔥:");
-  console.error(err);
-  console.error(err.stack);
-  next(err);
-});
-
-//final handle error
-const handleErrors = require("./app/middleware/handleErrors");
-const { info } = require("console");
-const { version } = require("os");
-app.use(handleErrors);
-
 //Swagger Docs
 const options = {
   definition: {
@@ -81,14 +61,37 @@ const options = {
       },
     ],
   },
-  apis: ["./app/router/*.js"],
+  apis: ["./**/*.js"],
 };
-const spacs = swaggerjsdoc(options);
+const specs = swaggerjsdoc(options);
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spacs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+//Testing
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
+//using routes
+const userRoute = require("./app/router/userRouter");
+app.use("/api", userRoute);
+const productRoute = require("./app/router/productRouter");
+app.use("/api", productRoute);
+
+// Debug error logger
+app.use((err, req, res, next) => {
+  console.error("🔥🔥🔥 FULL ERROR 🔥🔥🔥:");
+  console.error(err);
+  console.error(err.stack);
+  next(err);
+});
+
+//final handle error
+const handleErrors = require("./app/middleware/handleErrors");
+app.use(handleErrors);
 
 //creating server
-const PORT = 8080;
+const PORT = 8080 || process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server stared at ${PORT}`);
 });
