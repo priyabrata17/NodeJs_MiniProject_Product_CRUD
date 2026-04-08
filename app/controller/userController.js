@@ -165,9 +165,17 @@ class UserController {
       });
     }
 
+    // if (!existingUser.isVerified) {
+    //   await sendEmailVerificationOtp(existingUser);
+    //   return res.status(400).json({
+    //     message:
+    //       "Email is not verified.A verification OTP send to your email.Please verify before continue.",
+    //   });
+    // }
+
     const isMatch = await bcrypt.compare(password, existingUser.password);
     if (!isMatch) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: "Incorrect password !!",
       });
     }
@@ -283,7 +291,7 @@ class UserController {
     });
   }
 
-  // req pass otp
+  // req pass reset link
   async forgotPasswordLink(req, res) {
     const { email } = req.body;
     if (!email) {
@@ -300,7 +308,9 @@ class UserController {
     const token = jwt.sign({ userId: existingUser._id }, secret, {
       expiresIn: "20m",
     });
-    const resetLink = `${process.env.FRONTEND_HOST}/api/auth/reset-password/${token}/${existingUser._id}`;
+
+    //a page generate by frontend with this link
+    const resetLink = `${process.env.FRONTEND_HOST}/api/auth/reset-password-page/${token}/${existingUser._id}`;
 
     const filePath = path.join(process.cwd(), "views/passwordResetLink.ejs");
     const htmlContent = await ejs.renderFile(filePath, { resetLink });
@@ -341,7 +351,7 @@ class UserController {
       });
     }
 
-    if (decoded.id !== id) {
+    if (decoded.userId !== id) {
       return res.status(403).json({
         message: "Error! Unauthorized request !!",
       });
@@ -405,10 +415,12 @@ class UserController {
     }
 
     const secret = process.env.JWT_ACCESS_TOKEN_SECRET_KEY + existingUser._id;
-    const token = jwt.sign({ id: existingUser._id }, secret, {
+    const token = jwt.sign({ userId: existingUser._id }, secret, {
       expiresIn: "20m",
     });
-    const link = `${process.env.FRONTEND_HOST}/api/auth/delete-account/${token}/${existingUser._id}`;
+
+    //a page generate by fronend using this link
+    const link = `${process.env.FRONTEND_HOST}/api/auth/delete-account-page/${token}/${existingUser._id}`;
 
     const filePath = path.join(process.cwd(), "views/deleteAccount.ejs");
     const htmlContent = await ejs.renderFile(filePath, { link });
@@ -431,6 +443,8 @@ class UserController {
   async deleteUser(req, res) {
     const { id, token } = req.params;
     const existingUser = await UserModel.findById(id);
+    const {confirm} = req.body;
+
     if (!existingUser) {
       return res.status(404).json({
         message: "No user Found !!",
@@ -446,9 +460,16 @@ class UserController {
       });
     }
 
-    if (decoded.id !== id) {
+    if (decoded.userId !== id) {
       return res.status(403).json({
         messge: "Error! Unauthorized request !!",
+      });
+    }
+
+    if(confirm !== "CONFIRM") {
+      return res.status(400).json({
+        status: false,
+        message: "Keyword mismatch! Please try again"
       });
     }
 
