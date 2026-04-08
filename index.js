@@ -61,7 +61,7 @@ const options = {
       },
     ],
   },
-  apis: ["./app/router/*.js"],
+  apis: [path.join(__dirname, "app/router/*.js")],
 };
 const specs = swaggerjsdoc(options);
 
@@ -91,7 +91,7 @@ const handleErrors = require("./app/middleware/handleErrors");
 app.use(handleErrors);
 
 //creating server
-const PORT = 8080 || process.env.PORT;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server stared at ${PORT}`);
 });
