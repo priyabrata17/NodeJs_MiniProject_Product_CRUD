@@ -23,6 +23,9 @@
  *         price:
  *           type: string
  *           description: Product price
+ *         category:
+ *           type: string
+ *           description: Product category
  *         images:
  *           type: array
  *           items:
@@ -43,6 +46,8 @@
  *         description:
  *           type: string
  *         price:
+ *           type: string
+ *         category:
  *           type: string
  *         images:
  *           type: array

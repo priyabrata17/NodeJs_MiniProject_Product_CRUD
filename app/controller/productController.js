@@ -4,10 +4,10 @@ const deleteFiles = require("../helper/deleteFiles");
 
 class ProductController {
   async createProduct(req, res) {
-    const { title, company, description, price } = req.body;
+    const { title, company, description, price, category } = req.body;
     const files = req?.files;
 
-    if (!title || !company || !description || !price) {
+    if (!title || !company || !description || !price || !category) {
       deleteFiles(files);
       return res.status(400).json({
         message: "All fields are required !!",
@@ -26,6 +26,7 @@ class ProductController {
       company,
       description,
       price,
+      category,
     });
 
     let imgArr = [];
@@ -93,9 +94,9 @@ class ProductController {
       });
     }
 
-    const { title, price, description, company } = req.body;
+    const { title, price, description, company, category } = req.body;
     let files = req?.files;
-    if (!title || !price || !description || !company) {
+    if (!title || !price || !description || !company || !category) {
       await deleteFiles(files);
       return res.status(400).json({
         status: false,
@@ -108,6 +109,7 @@ class ProductController {
       price,
       description,
       company,
+      category,
     });
 
     if (files?.length) {
@@ -186,7 +188,7 @@ class ProductController {
     }
 
     existingProduct.images = existingProduct.images.filter(
-      (img) => img.fileId !== oldFileId
+      (img) => img.fileId !== oldFileId,
     );
     await existingProduct.save();
 
@@ -214,8 +216,8 @@ class ProductController {
       try {
         Promise.all(
           existingProduct.images.map((img) =>
-            cloudinary.uploader.destroy(img.fileId)
-          )
+            cloudinary.uploader.destroy(img.fileId),
+          ),
         );
       } catch (error) {
         console.log("An error occured when deleting files: ", error);
