@@ -46,22 +46,22 @@ class ProductController {
 
   async viewProducts(req, res) {
     const page = parseInt(req?.query?.page) || 1;
-    const limit = parseInt(req?.query?.limit) || 6;
-    const skip = (page - 1) * limit;
+    // const limit = parseInt(req?.query?.limit) || 6;
+    // const skip = (page - 1) * limit;
 
     const totalProducts = await ProductModel.countDocuments();
     const allProducts = await ProductModel.find({}, { __v: 0 })
-      .skip(skip)
-      .limit(limit);
+      // .skip(skip)
+      // .limit(limit);
 
     const totalPages = Math.ceil(totalProducts / limit);
 
     return res.status(200).json({
       status: true,
       message: "Data fetch successfully",
-      page,
-      limit,
-      totalPages,
+      // page,
+      // limit,
+      // totalPages,
       data: allProducts,
     });
   }
