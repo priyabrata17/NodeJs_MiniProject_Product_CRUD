@@ -16,7 +16,7 @@ const generateToken = async (user, rememberMe) => {
     const accessToken = jwt.sign(
       payload,
       process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
-      { expiresIn: "25m" }
+      { expiresIn: "2m" }
     );
 
     const refreshToken = jwt.sign(
